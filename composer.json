@@ -19,7 +19,7 @@
         "php": "^8.0",
         "laravel/framework": "^8.67|^9.0|^10.0|^11.0",
         "nesbot/carbon": "^2.63|^3.0",
-        "secretwebmaster/wncms-translatable": "^4.6|^5.0|^6.0"
+        "secretwebmaster/wncms-translatable": "^1.0.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.13|^7.0|^8.0|^9.0",
