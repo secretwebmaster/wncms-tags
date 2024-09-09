@@ -19,7 +19,6 @@
         "php": "^8.0",
         "laravel/framework": "^8.67|^9.0|^10.0|^11.0",
         "nesbot/carbon": "^2.63|^3.0",
-        "spatie/eloquent-sortable": "^3.10|^4.0",
         "secretwebmaster/wncms-translatable": "^4.6|^5.0|^6.0"
     },
     "require-dev": {
