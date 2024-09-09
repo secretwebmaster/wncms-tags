@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection as DbCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Wncms\Translatable\HasTranslations;
+use Wncms\Translatable\Traits\HasTranslations;
 
 class Tag extends Model
 {
