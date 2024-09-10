@@ -16,7 +16,7 @@ class Tag extends Model
     use HasFactory;
 
     public array $translatable = ['name'];
-    protected bool $isTranslatable;
+    protected static bool $isTranslatable;
 
     public $guarded = [];
 
@@ -28,12 +28,12 @@ class Tag extends Model
 
     public function setIsTranslatable()
     {
-        $this->isTranslatable = config('wncms-tags.is_translatable', false);
+        self::$isTranslatable = config('wncms-tags.is_translatable', false);
     }
 
-    public function getIsTranslatable()
+    public static function getIsTranslatable()
     {
-        return $this->isTranslatable;
+        return self::$isTranslatable;
     }
 
     public static function getLocale()
@@ -89,7 +89,7 @@ class Tag extends Model
             ->where('type', $type)
             ->where(function ($query) use ($name, $locale) {
                 $query->where("name", $name);
-                if(self::$isTranslatable){
+                if(self::getIsTranslatable()){
                     $query->orWhereHas("translations", function($subq) use ($name, $locale){
                         $subq->where('field', 'name')
                             ->where('value', $name)
@@ -111,7 +111,7 @@ class Tag extends Model
                       ->orWhere("slug", $name);
     
                 // If the model is translatable, check the translations table
-                if (self::$isTranslatable) {
+                if (self::getIsTranslatable()) {
                     $query->orWhereHas("translations", function ($subq) use ($name, $locale) {
                         $subq->where(function ($q) use ($name) {
                                 $q->where('field', 'name')
@@ -134,10 +134,11 @@ class Tag extends Model
         if (! $tag) {
             $tag = static::create([
                 'name' => $name,
+                'slug' => $name,
                 'type' => $type,
             ]);
 
-            if (self::$isTranslatable && ($locale != config('app.locale'))) {
+            if (self::getIsTranslatable() && ($locale != config('app.locale'))) {
                 $tag->translations()->create([
                     'field' => 'name',
                     'locale' => $locale,

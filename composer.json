@@ -22,7 +22,7 @@
         "secretwebmaster/wncms-translatable": "^1.0.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.13|^7.0|^8.0|^9.0",
+        "orchestra/testbench": "^8.26",
         "pestphp/pest": "^1.22|^2.0",
         "phpunit/phpunit": "^9.5.2"
     },
