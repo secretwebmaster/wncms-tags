@@ -282,4 +282,29 @@ trait HasTags
             $this->tags()->touchIfTouching();
         }
     }
+
+    public  function getFirstTag($tagType)
+    {   
+        return $this->tags?->where('type', $tagType)->first();
+    }
+
+    /**
+     * This is experimental
+     * Add compatability to Tagify. Sync tags from tagify string
+     * @param string|null $tagifyString
+     * @param null $type
+     * @return $this
+     */
+    public function syncTagsFromTagify(string|null $tagifyString = null, $type = null): static
+    {
+        if(!empty($tagifyString)){
+            $className = static::getTagClassName();
+            $tagNames = collect(json_decode($tagifyString, true))->pluck('value')->toArray();
+            $tags = collect($className::findOrCreate($tagNames, $type));
+            $this->syncTagIds($tags->pluck('id')->toArray(), $type);
+        }else{
+            $this->syncTagIds([], $type);
+        }
+        return $this;
+    }
 }
