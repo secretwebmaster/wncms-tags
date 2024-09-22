@@ -26,6 +26,16 @@ class Tag extends Model
         $this->setIsTranslatable();
     }
 
+    public function children()
+    {
+        return $this->hasMany(Tag::class, 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Tag::class, 'parent_id');
+    }
+
     public function setIsTranslatable()
     {
         self::$isTranslatable = config('wncms-tags.is_translatable', false);
@@ -128,7 +138,6 @@ class Tag extends Model
     public static function findOrCreateFromString(string $name, string $type = null, string $locale = null)
     {
         $locale = $locale ?? static::getLocale();
-
         $tag = static::findFromString($name, $type, $locale);
 
         if (! $tag) {
@@ -137,14 +146,6 @@ class Tag extends Model
                 'slug' => $name,
                 'type' => $type,
             ]);
-
-            if (self::getIsTranslatable() && ($locale != config('app.locale'))) {
-                $tag->translations()->create([
-                    'field' => 'name',
-                    'locale' => $locale,
-                    'value' => $name,
-                ]);
-            }
         }
 
         return $tag;
