@@ -98,7 +98,7 @@ class Tag extends Model
         return static::query()
             ->where('type', $type)
             ->where(function ($query) use ($name, $locale) {
-                $query->where("name", $name);
+                $query->where("name", $name)->orWhere("slug", $name);
                 if(self::getIsTranslatable()){
                     $query->orWhereHas("translations", function($subq) use ($name, $locale){
                         $subq->where('field', 'name')
