@@ -15,11 +15,6 @@ trait HasTags
 {
     protected array $queuedTags = [];
 
-    public static function getTagClassName(): string
-    {
-        return config('wncms-tags.tag_model', Tag::class);
-    }
-
     public function getTaggableMorphName(): string
     {
         return config('wncms-tags.taggable.morph_name', 'taggable');
@@ -72,7 +67,7 @@ trait HasTags
     public function scopeWithAllTags(
         Builder $query,
         string | array | ArrayAccess | Tag $tags,
-        string $type = null,
+        ?string $type = null,
     ): Builder {
         $tags = static::convertToTags($tags, $type);
 
@@ -88,7 +83,7 @@ trait HasTags
     public function scopeWithAnyTags(
         Builder $query,
         string | array | ArrayAccess | Tag $tags,
-        string $type = null,
+        ?string $type = null,
     ): Builder {
         $tags = static::convertToTags($tags, $type);
 
@@ -103,7 +98,7 @@ trait HasTags
     public function scopeWithoutTags(
         Builder $query,
         string | array | ArrayAccess | Tag $tags,
-        string $type = null
+        ?string $type = null
     ): Builder {
         $tags = static::convertToTags($tags, $type);
 
@@ -142,14 +137,14 @@ trait HasTags
         );
     }
 
-    public function tagsWithType(string $type = null): Collection
+    public function tagsWithType(?string $type = null): Collection
     {
         return $this->tags->filter(fn (Tag $tag) => $tag->type === $type);
     }
 
-    public function attachTags(array | ArrayAccess | Tag $tags, string $type = null): static
+    public function attachTags(array | ArrayAccess | Tag $tags, string | null $type = null): static
     {
-        $className = static::getTagClassName();
+        $className = wncms()->getModelClass('tag');
         $tags = collect($className::findOrCreate($tags, $type));
         $this->tags()->syncWithoutDetaching($tags->pluck('id')->toArray());
         return $this;
@@ -182,7 +177,7 @@ trait HasTags
             $tags = Arr::wrap($tags);
         }
 
-        $className = static::getTagClassName();
+        $className = wncms()->getModelClass('tag');
 
         $tags = collect($className::findOrCreate($tags));
 
@@ -193,7 +188,7 @@ trait HasTags
 
     public function syncTagsWithType(array | ArrayAccess $tags, string | null $type = null): static
     {
-        $className = static::getTagClassName();
+        $className = wncms()->getModelClass('tag');
 
         $tags = collect($className::findOrCreate($tags, $type));
 
@@ -217,7 +212,7 @@ trait HasTags
                 return $value;
             }
 
-            $className = static::getTagClassName();
+            $className = wncms()->getModelClass('tag');
 
             return $className::findFromString($value, $type, $locale);
         });
@@ -230,7 +225,7 @@ trait HasTags
                 return $value;
             }
 
-            $className = static::getTagClassName();
+            $className = wncms()->getModelClass('tag');
 
             return $className::findFromStringOfAnyType($value, $locale);
         })->flatten();
@@ -298,7 +293,7 @@ trait HasTags
     public function syncTagsFromTagify(string|null $tagifyString = null, $type = null): static
     {
         if(!empty($tagifyString)){
-            $className = static::getTagClassName();
+            $className = wncms()->getModelClass('tag');
             $tagNames = collect(json_decode($tagifyString, true))->pluck('value')->toArray();
             $tags = collect($className::findOrCreate($tagNames, $type));
             $this->syncTagIds($tags->pluck('id')->toArray(), $type);
