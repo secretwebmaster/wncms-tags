@@ -18,23 +18,24 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^8.67|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/database": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
         "nesbot/carbon": "^2.63|^3.0",
-        "secretwebmaster/wncms-translatable": "^1.0.0"
+        "secretwebmaster/wncms-translatable": "^1.2.9"
     },
     "require-dev": {
         "orchestra/testbench": "^10.0",
-        "pestphp/pest": "^2.0",
-        "phpunit/phpunit": "^11.0"
+        "pestphp/pest": "^3.0",
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
-            "Wncms\\Tags\\": "src"
+            "Wncms\\Tags\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Wncms\\Tags\\Test\\": "tests"
+            "Wncms\\Tags\\Test\\": "tests/"
         }
     },
     "scripts": {
