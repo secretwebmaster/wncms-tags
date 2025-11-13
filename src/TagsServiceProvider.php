@@ -13,10 +13,12 @@ class TagsServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/wncms-tags.php' => config_path('wncms-tags.php'),
-                __DIR__ . '/../migrations/' => database_path('migrations'),
+                __DIR__ . '/../database/migrations/' => database_path('migrations'),
             ], 'wncms-tags');
         }
     }

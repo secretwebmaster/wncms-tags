@@ -16,7 +16,7 @@ class Tag extends Model
     use HasFactory;
 
     public array $translatable = ['name'];
-    protected static bool $isTranslatable;
+    protected static bool $isTranslatable = false;
 
     public $guarded = [];
 
@@ -51,7 +51,7 @@ class Tag extends Model
         return app()->getLocale();
     }
 
-    public function scopeWithType(Builder $query, string $type = null): Builder
+    public function scopeWithType(Builder $query, ?string $type = null): Builder
     {
         if (is_null($type)) {
             return $query;
@@ -60,9 +60,9 @@ class Tag extends Model
         return $query->where('type', $type)->ordered();
     }
 
-    public function scopeOrdered(Builder $query, string $direction = 'asc')
+    public function scopeOrdered(Builder $query, string $direction = 'desc')
     {
-        return $query->orderBy('order_column', $direction);
+        return $query->orderBy('sort', $direction);
     }
 
     public static function getTypes(): Collection
@@ -76,10 +76,10 @@ class Tag extends Model
     }
 
     public static function findOrCreate(
-        string | array | ArrayAccess $values,
-        string | null $type = null,
-        string | null $locale = null,
-    ): Collection | Tag | static {
+        string|array|ArrayAccess $values,
+        ?string $type = null,
+        ?string $locale = null,
+    ): Collection|Tag|static {
         $tags = collect($values)->map(function ($value) use ($type, $locale) {
             if ($value instanceof self) {
                 return $value;
@@ -91,16 +91,18 @@ class Tag extends Model
         return is_string($values) ? $tags->first() : $tags;
     }
 
-    public static function findFromString(string $name, string $type = null, string $locale = null)
+    public static function findFromString(string $name, ?string $type = null, ?string $locale = null)
     {
         $locale = $locale ?? static::getLocale();
 
         return static::query()
             ->where('type', $type)
-            ->where(function ($query) use ($name, $locale) {
-                $query->where("name", $name)->orWhere("slug", $name);
-                if(self::getIsTranslatable()){
-                    $query->orWhereHas("translations", function($subq) use ($name, $locale){
+            ->where(function (Builder $query) use ($name, $locale) {
+                $query->where('name', $name)
+                    ->orWhere('slug', $name);
+
+                if (self::getIsTranslatable()) {
+                    $query->orWhereHas('translations', function (Builder $subq) use ($name, $locale) {
                         $subq->where('field', 'name')
                             ->where('value', $name)
                             ->where('locale', $locale);
@@ -110,32 +112,30 @@ class Tag extends Model
             ->first();
     }
 
-    public static function findFromStringOfAnyType(string $name, string $locale = null)
+    public static function findFromStringOfAnyType(string $name, ?string $locale = null)
     {
         $locale = $locale ?? static::getLocale();
-    
+
         return static::query()
-            ->where(function ($query) use ($name, $locale) {
-                // Search by original 'name' or 'slug'
-                $query->where("name", $name)
-                      ->orWhere("slug", $name);
-    
-                // If the model is translatable, check the translations table
+            ->where(function (Builder $query) use ($name, $locale) {
+                $query->where('name', $name)
+                    ->orWhere('slug', $name);
+
                 if (self::getIsTranslatable()) {
-                    $query->orWhereHas("translations", function ($subq) use ($name, $locale) {
-                        $subq->where(function ($q) use ($name) {
-                                $q->where('field', 'name')
-                                  ->orWhere('field', 'slug');
-                            })
-                            ->where('value', $name)   // Match the translated value
-                            ->where('locale', $locale); // Match the locale
+                    $query->orWhereHas('translations', function (Builder $subq) use ($name, $locale) {
+                        $subq->where(function (Builder $q) use ($name) {
+                            $q->where('field', 'name')
+                                ->orWhere('field', 'slug');
+                        })
+                        ->where('value', $name)
+                        ->where('locale', $locale);
                     });
                 }
             })
             ->get();
     }
-    
-    public static function findOrCreateFromString(string $name, string $type = null, string $locale = null)
+
+    public static function findOrCreateFromString(string $name, ?string $type = null, ?string $locale = null)
     {
         $locale = $locale ?? static::getLocale();
         $tag = static::findFromString($name, $type, $locale);
