@@ -15,6 +15,8 @@ trait HasTags
 {
     protected array $queuedTags = [];
 
+    protected static array $allowedTagTypes = [];
+
     public function getTaggableMorphName(): string
     {
         return config('wncms-tags.taggable.morph_name', 'taggable');
@@ -118,7 +120,7 @@ trait HasTags
             ->each(function ($tag) use ($query) {
                 $query->whereHas(
                     'tags',
-                    fn (Builder $query) => $query->where('tags.id', $tag ? $tag->id : 0)
+                    fn(Builder $query) => $query->where('tags.id', $tag ? $tag->id : 0)
                 );
             });
 
@@ -133,13 +135,13 @@ trait HasTags
 
         return $query->whereHas(
             'tags',
-            fn (Builder $query) => $query->whereIn('tags.id', $tagIds)
+            fn(Builder $query) => $query->whereIn('tags.id', $tagIds)
         );
     }
 
     public function tagsWithType(?string $type = null): Collection
     {
-        return $this->tags->filter(fn (Tag $tag) => $tag->type === $type);
+        return $this->tags->filter(fn(Tag $tag) => $tag->type === $type);
     }
 
     public function attachTags(array | ArrayAccess | Tag $tags, string | null $type = null): static
@@ -161,7 +163,7 @@ trait HasTags
 
         collect($tags)
             ->filter()
-            ->each(fn (Tag $tag) => $this->tags()->detach($tag));
+            ->each(fn(Tag $tag) => $this->tags()->detach($tag));
 
         return $this;
     }
@@ -278,8 +280,8 @@ trait HasTags
         }
     }
 
-    public  function getFirstTag($tagType)
-    {   
+    public function getFirstTag($tagType)
+    {
         return $this->tags?->where('type', $tagType)->first();
     }
 
@@ -292,14 +294,37 @@ trait HasTags
      */
     public function syncTagsFromTagify(string|null $tagifyString = null, $type = null): static
     {
-        if(!empty($tagifyString)){
+        if (!empty($tagifyString)) {
             $className = wncms()->getModelClass('tag');
             $tagNames = collect(json_decode($tagifyString, true))->pluck('value')->toArray();
             $tags = collect($className::findOrCreate($tagNames, $type));
             $this->syncTagIds($tags->pluck('id')->toArray(), $type);
-        }else{
+        } else {
             $this->syncTagIds([], $type);
         }
         return $this;
+    }
+
+    public function getAllowedTagTypes(): array
+    {
+        $class = static::class;
+        return static::$allowedTagTypes[$class] ?? [];
+    }
+
+    public function setAllowedTagTypes(array $tags): void
+    {
+        $class = static::class;
+        static::$allowedTagTypes[$class] = $tags;
+    }
+
+    public function addAllowedTagTypes(string|array $tags): void
+    {
+        $tags = (array) $tags;
+        $class = static::class;
+
+        static::$allowedTagTypes[$class] = array_unique(array_merge(
+            static::$allowedTagTypes[$class] ?? [],
+            $tags
+        ));
     }
 }

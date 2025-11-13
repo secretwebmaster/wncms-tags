@@ -1,6 +1,7 @@
 {
     "name": "secretwebmaster/wncms-tags",
     "description": "Add tags and taggable behaviour to your Wncms",
+    "version": "1.7.0",
     "keywords": [
         "secretwebmaster",
         "wncms",
