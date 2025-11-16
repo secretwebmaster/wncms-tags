@@ -1,7 +1,6 @@
 {
     "name": "secretwebmaster/wncms-tags",
     "description": "Add tags and taggable behaviour to your Wncms",
-    "version": "1.7.0",
     "keywords": [
         "secretwebmaster",
         "wncms",
@@ -53,6 +52,9 @@
             "providers": [
                 "Wncms\\Tags\\TagsServiceProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "1.7.x-dev"
         }
     },
     "minimum-stability": "stable",

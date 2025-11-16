@@ -15,6 +15,7 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('slug');
                 $table->string('type')->nullable();
+                $table->string('group')->nullable();
                 $table->string('description')->nullable();
                 $table->string('icon')->nullable();
                 $table->integer('sort')->nullable();

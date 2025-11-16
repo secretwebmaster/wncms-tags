@@ -15,8 +15,6 @@ trait HasTags
 {
     protected array $queuedTags = [];
 
-    protected static array $allowedTagTypes = [];
-
     public function getTaggableMorphName(): string
     {
         return config('wncms-tags.taggable.morph_name', 'taggable');
@@ -303,28 +301,5 @@ trait HasTags
             $this->syncTagIds([], $type);
         }
         return $this;
-    }
-
-    public function getAllowedTagTypes(): array
-    {
-        $class = static::class;
-        return static::$allowedTagTypes[$class] ?? [];
-    }
-
-    public function setAllowedTagTypes(array $tags): void
-    {
-        $class = static::class;
-        static::$allowedTagTypes[$class] = $tags;
-    }
-
-    public function addAllowedTagTypes(string|array $tags): void
-    {
-        $tags = (array) $tags;
-        $class = static::class;
-
-        static::$allowedTagTypes[$class] = array_unique(array_merge(
-            static::$allowedTagTypes[$class] ?? [],
-            $tags
-        ));
     }
 }

@@ -16,6 +16,7 @@ class Tag extends Model
     use HasFactory;
 
     public array $translatable = ['name'];
+    
     protected static bool $isTranslatable = false;
 
     public $guarded = [];
