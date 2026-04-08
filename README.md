@@ -80,7 +80,7 @@ $tag->slug; //返回 "tag_slug_1"
 
 ## 需求
 
-此套件需要 Laravel 8 或更高版本、PHP 8 或更高版本，以及支援 MySQL 相容功能的資料庫。
+此套件的 `1.8.x` minor 線需要 PHP 8.4+、Illuminate 13（`illuminate/database` 與 `illuminate/support` ^13.0），以及 `secretwebmaster/wncms-translatable` ^1.4.0。
 
 ## 安裝
 
@@ -90,16 +90,24 @@ $tag->slug; //返回 "tag_slug_1"
 composer require secretwebmaster/wncms-tags
 ```
 
-套件將會自動註冊。
+套件將會自動註冊。若您使用 WNCMS monorepo，建議同步搭配 `secretwebmaster/wncms-translatable:^1.4.0`，以避免 Laravel 13 升級後仍回落到舊的 Illuminate 相依線。
 
-您可以使用以下指令發佈 migrtation 檔案以及 config 配置文件：
+您可以使用以下指令發佈 migration 檔案以及 config 配置文件：
 
 ```bash
-php artisan vendor:publish --provider="Wncms\Tags\TagsServiceProvider" --tag="tags-migrations"
+php artisan vendor:publish --provider="Wncms\Tags\TagsServiceProvider" --tag="wncms-tags"
 ```
 
-發佈 migrtation 檔案後，您可以通過執行 `migrate` 來創建 `tags` 和 `taggables` 資料表：
+發佈 migration 檔案後，您可以通過執行 `migrate` 來創建 `tags` 和 `taggables` 資料表：
 
 ```bash
 php artisan migrate
 ```
+
+## Laravel 13 驗證範圍
+
+`1.8.x` 已補上以下整合驗證：
+
+- 一般 tag attach / detach / sync 流程
+- `keyword` 類型 tag 的 attach 與 `withAnyTags()` 篩選
+- `wncms-translatable` 下的 tag 名稱翻譯與 translated-name lookup

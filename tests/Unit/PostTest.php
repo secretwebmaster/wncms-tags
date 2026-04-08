@@ -2,82 +2,13 @@
 
 namespace Wncms\Tags\Tests\Unit;
 
-use Orchestra\Testbench\TestCase;
-use Wncms\Tags\Tag;
-use Wncms\Tags\TagsServiceProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Wncms\Tags\Test\Models\Post;
-use Illuminate\Config\Repository;
-use Illuminate\Support\Facades\Config;
+use Wncms\Tags\Tests\TestCase;
 
 class PostTest extends TestCase
 {
-    /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
-     */
-    protected function getPackageProviders($app)
-    {
-        return [
-            TagsServiceProvider::class,
-        ];
-    }
-
-    /**
-     * Define environment setup.
-     * Replacement of getEnvironmentSetup() method.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function defineEnvironment($app) 
-    {
-        // Setup default database to use sqlite :memory:
-        tap($app['config'], function (Repository $config) { 
-            $config->set('database.default', 'testbench'); 
-            $config->set('database.connections.testbench', [ 
-                'driver'   => 'sqlite', 
-                'database' => ':memory:', 
-                'prefix'   => '', 
-            ]); 
-            
-            // Setup queue database connections.
-            $config->set('queue.batching.database', 'testbench');
-            $config->set('queue.failed.database', 'testbench');
-        });
-    }
-
-    protected function setUp(): void
-    {
-        $this->afterApplicationCreated(function () {
-            //test
-            $this->loadMigrationsFrom(__DIR__ . '/../migrations');
-            //vendor
-            $this->loadMigrationsFrom(__DIR__ . '/../../vendor/secretwebmaster/wncms-translatable/migrations');
-            //package
-            $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
-        });
-
-        $this->beforeApplicationDestroyed(function () {
-            // Code before application destroyed.
-        });
-
-        parent::setUp();
-    }
-
-    /**
-     * Get the application timezone.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return string|null
-     */
-    protected function getApplicationTimezone($app) 
-    {
-        return 'Asia/Taipei';
-    }
-
-    protected function createPost($title = "Title", $content = "Content")
+    protected function createPost(string $title = 'Title', string $content = 'Content'): Post
     {
         return Post::create([
             'title' => $title,
@@ -85,30 +16,35 @@ class PostTest extends TestCase
         ]);
     }
 
-    protected function createPosts($count, $withTags = false)
-    {
-        for($i = 0; $i < $count; $i++) {
-            $post = $this->createPost("Post $i", "Content $i");
-            if($withTags) {
-                $post->attachTag("Tag $i");
-            }
-        }
-        return Post::all();
-    }
-
-
-    /** @test */
-    public function a_post_can_be_created()
+    #[Test]
+    public function a_post_can_be_created(): void
     {
         $post = $this->createPost();
+
         $this->assertTrue($post->exists);
     }
 
-    /** @test */
-    public function a_post_can_be_fetched()
+    #[Test]
+    public function queued_tags_are_attached_after_the_model_is_created(): void
+    {
+        $post = new Post([
+            'title' => 'Queued tags',
+            'content' => 'Content',
+        ]);
+
+        $post->tags = 'queued-tag';
+        $post->save();
+
+        $this->assertSame(['queued-tag'], $post->fresh()->tags->pluck('name')->all());
+    }
+
+    #[Test]
+    public function a_post_can_be_fetched(): void
     {
         $this->createPost();
-        $post = Post::first();
+
+        $post = Post::query()->first();
+
         $this->assertTrue($post?->exists);
     }
 }

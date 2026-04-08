@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.8.0] - 2026-04-08
+### Changed
+- Finalize the Laravel 13 / Illuminate 13 minor line for `1.8.x`
+- Align the package test stack with `orchestra/testbench:^11.0` and `phpunit:^12.5`
+- Require `secretwebmaster/wncms-translatable:^1.4.0` to match the Illuminate 13 release line
+- Add release support metadata and a package-local PHPUnit configuration for monorepo validation
+
+### Fixed
+- Normalize queued tag assignment so unsaved models can safely defer tag syncing on PHP 8.4+
+- Allow `detachTags()` to accept a single `Tag` instance without type errors
+- Update package tests to verify tag attach/detach, keyword-type filtering, and translatable tag lookup under Illuminate 13
+
 ## [v1.7.0] - 2025-11-13
 ### Changed
 - Replace `order_column` with `sort` field across Tag model

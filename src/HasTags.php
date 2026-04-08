@@ -57,7 +57,7 @@ trait HasTags
     public function setTagsAttribute(string | array | ArrayAccess | Tag $tags)
     {
         if (! $this->exists) {
-            $this->queuedTags = $tags;
+            $this->queuedTags = Arr::wrap($tags);
             return;
         }
 
@@ -155,7 +155,7 @@ trait HasTags
         return $this->attachTags([$tag], $type);
     }
 
-    public function detachTags(array | ArrayAccess $tags, string | null $type = null): static
+    public function detachTags(array | ArrayAccess | Tag $tags, string | null $type = null): static
     {
         $tags = static::convertToTags($tags, $type);
 
