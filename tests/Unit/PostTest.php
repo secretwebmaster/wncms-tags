@@ -39,6 +39,19 @@ class PostTest extends TestCase
     }
 
     #[Test]
+    public function allowed_tags_can_be_set_and_extended_without_duplicates(): void
+    {
+        $post = new Post();
+
+        $post->setAllowedTags(['news']);
+        $post->addAllowedTag(['featured', 'news']);
+        $post->addAllowedTag('archived');
+
+        $this->assertSame(['news', 'featured', 'archived'], array_values($post->getAllowedTags()));
+        $this->assertSame(['news', 'featured', 'archived'], array_values((new Post())->getAllowedTags()));
+    }
+
+    #[Test]
     public function a_post_can_be_fetched(): void
     {
         $this->createPost();
